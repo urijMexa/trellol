@@ -1,23 +1,23 @@
 {
   "name": "trellol",
   "version": "1.0.0",
-  "main": "index.js",
-  "repository": "your-repository-url",
-  "author": "Your Name",
-  "license": "MIT",
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/urijMexa/trellol.git"
+  },
   "scripts": {
     "start": "webpack serve --mode development",
     "build": "webpack --mode production",
     "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
-    "css-loader": "^6.7.1",
-    "gh-pages": "^4.0.0",
-    "html-webpack-plugin": "^5.5.0",
-    "mini-css-extract-plugin": "^2.6.1",
-    "style-loader": "^3.3.1",
-    "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0",
-    "webpack-dev-server": "^4.10.0"
+    "css-loader": "^6.8.1",
+    "html-webpack-plugin": "^5.5.3",
+    "mini-css-extract-plugin": "^2.7.6",
+    "style-loader": "^3.3.3",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
   }
 }
