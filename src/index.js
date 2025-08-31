@@ -27,15 +27,32 @@ class Trellol {
             this.columns[0].cards = [
                 { id: Date.now() + 1, text: 'Welcome to Trellol' },
                 { id: Date.now() + 2, text: 'This is a card.' },
-                { id: Date.now() + 3, text: 'Click on a card to see what\'s behind it.' }
+                { id: Date.now() + 3, text: 'Click on a card to see what\'s behind it.' },
+                { id: Date.now() + 4, text: '- 💬 1' },
+                { id: Date.now() + 5, text: '- 💬 2' },
+                { id: Date.now() + 6, text: 'You can attach pictures and files...' },
+                { id: Date.now() + 7, text: '... any kind of hyperlink ...' },
+                { id: Date.now() + 8, text: '- 💬 1' },
+                { id: Date.now() + 9, text: '... or checklists.' },
+                { id: Date.now() + 10, text: '- 💬 1/3' }
             ];
             this.columns[1].cards = [
-                { id: Date.now() + 4, text: 'Invite your team to this board using the Add Members button' },
-                { id: Date.now() + 5, text: 'Drag people onto a card to indicate that they\'re responsible for it.' }
+                { id: Date.now() + 11, text: 'Invite your team to this board using the Add Members button' },
+                { id: Date.now() + 12, text: 'Drag people onto a card to indicate that they\'re responsible for it.' },
+                { id: Date.now() + 13, text: 'Use color-coded labels for organization' },
+                { id: Date.now() + 14, text: 'Make as many lists as you need!' },
+                { id: Date.now() + 15, text: 'Try dragging cards anywhere.' },
+                { id: Date.now() + 16, text: 'Finished with a card? Archive it.' }
             ];
             this.columns[2].cards = [
-                { id: Date.now() + 6, text: 'To learn more tricks, check out the guide.' },
-                { id: Date.now() + 7, text: 'Use as many boards as you want. We\'ll make more!' }
+                { id: Date.now() + 17, text: 'To learn more tricks, check out the guide.' },
+                { id: Date.now() + 18, text: 'Use as many boards as you want. We\'ll make more!' },
+                { id: Date.now() + 19, text: 'Want to use keyboard shortcuts? We have them!' },
+                { id: Date.now() + 20, text: 'Want updates on new features?' },
+                { id: Date.now() + 21, text: 'Need help?' },
+                { id: Date.now() + 22, text: '☐' },
+                { id: Date.now() + 23, text: 'Want current tips, usage examples, or API info?' },
+                { id: Date.now() + 24, text: '☐' }
             ];
             this.saveState();
         }
@@ -77,7 +94,7 @@ class Trellol {
         addCardButton.className = 'add-card-btn';
         addCardButton.textContent = '+ Add another card';
         addCardButton.addEventListener('click', () => {
-            this.addCard(column.id);
+            this.showAddCardForm(columnElement, column.id);
         });
 
         columnElement.appendChild(titleElement);
@@ -98,7 +115,7 @@ class Trellol {
 
         const deleteButton = document.createElement('span');
         deleteButton.className = 'delete-card';
-        deleteButton.innerHTML = '&#xE951;';
+        deleteButton.innerHTML = '×'; // Unicode крестик
         deleteButton.addEventListener('click', (e) => {
             e.stopPropagation();
             this.deleteCard(card.id);
@@ -107,7 +124,6 @@ class Trellol {
         cardElement.appendChild(cardText);
         cardElement.appendChild(deleteButton);
 
-        // Drag and drop events
         cardElement.addEventListener('dragstart', (e) => {
             e.dataTransfer.setData('text/plain', card.id.toString());
             setTimeout(() => {
@@ -122,10 +138,65 @@ class Trellol {
         return cardElement;
     }
 
+    showAddCardForm(columnElement, columnId) {
+        const addCardButton = columnElement.querySelector('.add-card-btn');
+        addCardButton.style.display = 'none';
+
+        const form = document.createElement('div');
+        form.className = 'add-card-form';
+
+        const textarea = document.createElement('textarea');
+        textarea.placeholder = 'Enter a title for this card...';
+        textarea.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.addCard(columnId, textarea.value);
+                this.removeAddCardForm(columnElement);
+            }
+        });
+
+        const actions = document.createElement('div');
+        actions.className = 'add-card-actions';
+
+        const addButton = document.createElement('button');
+        addButton.className = 'add-card-confirm';
+        addButton.textContent = 'Add Card';
+        addButton.addEventListener('click', () => {
+            this.addCard(columnId, textarea.value);
+            this.removeAddCardForm(columnElement);
+        });
+
+        const cancelButton = document.createElement('button');
+        cancelButton.className = 'add-card-cancel';
+        cancelButton.innerHTML = '✗';
+        cancelButton.addEventListener('click', () => {
+            this.removeAddCardForm(columnElement);
+        });
+
+        actions.appendChild(addButton);
+        actions.appendChild(cancelButton);
+
+        form.appendChild(textarea);
+        form.appendChild(actions);
+
+        columnElement.appendChild(form);
+        textarea.focus();
+    }
+
+    removeAddCardForm(columnElement) {
+        const form = columnElement.querySelector('.add-card-form');
+        if (form) {
+            form.remove();
+        }
+        const addCardButton = columnElement.querySelector('.add-card-btn');
+        if (addCardButton) {
+            addCardButton.style.display = 'block';
+        }
+    }
+
     setupEventListeners() {
         const app = document.getElementById('app');
 
-        // Setup drop zones for columns
         app.querySelectorAll('.column .cards-container').forEach(container => {
             container.addEventListener('dragover', (e) => {
                 e.preventDefault();
@@ -168,10 +239,9 @@ class Trellol {
         return Array.from(container.children).indexOf(cardElement);
     }
 
-    addCard(columnId) {
-        const text = prompt('Enter card text:');
-        if (text) {
-            const newCard = { id: Date.now(), text };
+    addCard(columnId, text) {
+        if (text && text.trim()) {
+            const newCard = { id: Date.now(), text: text.trim() };
             const column = this.columns.find(col => col.id === columnId);
             column.cards.push(newCard);
             this.saveState();
@@ -197,7 +267,6 @@ class Trellol {
         let card = null;
         let oldColumnId = null;
 
-        // Find the card and its current column
         for (const column of this.columns) {
             const cardIndex = column.cards.findIndex(c => c.id === cardId);
             if (cardIndex !== -1) {
@@ -208,15 +277,12 @@ class Trellol {
             }
         }
 
-        if (card && oldColumnId !== newColumnId) {
+        if (card) {
             const newColumn = this.columns.find(col => col.id === newColumnId);
             newColumn.cards.splice(newIndex, 0, card);
             this.saveState();
-            this.render();
-            this.setupEventListeners();
         }
     }
 }
 
-// Initialize the app
 new Trellol();
